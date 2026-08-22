@@ -1,6 +1,6 @@
 package com.carteiraacoesbackend.dto;
 
-import com.carteiraacoesbackend.domain.Mercado;
+import com.carteiraacoesbackend.domains.enums.Mercado;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 

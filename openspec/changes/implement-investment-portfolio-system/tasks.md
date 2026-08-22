@@ -16,10 +16,10 @@
 
 ## 3. Catálogo de usuários, carteiras e ações
 
-- [ ] 3.1 Implementar serviços e endpoints de criação, busca e paginação de usuários, garantindo e-mail único e senha ausente das respostas.
-- [ ] 3.2 Implementar serviços e endpoints de criação e consulta de carteiras, inclusive listagem por usuário e posições ativas.
-- [ ] 3.3 Implementar validação e endpoints de ações por ID e ticker, garantindo normalização de ticker e moeda derivada do mercado.
-- [ ] 3.4 Implementar testes de integração para catálogo, paginação, duplicidades e recursos inexistentes.
+- [x] 3.1 Implementar serviços e endpoints de criação, busca e paginação de usuários, garantindo e-mail único e senha ausente das respostas.
+- [x] 3.2 Implementar serviços e endpoints de criação e consulta de carteiras, inclusive listagem por usuário e posições ativas.
+- [x] 3.3 Implementar validação e endpoints de ações por ID e ticker, garantindo normalização de ticker e moeda derivada do mercado.
+- [x] 3.4 Implementar testes de integração para catálogo, paginação, duplicidades e recursos inexistentes.
 
 ## 4. Integrações externas e corretoras
 
