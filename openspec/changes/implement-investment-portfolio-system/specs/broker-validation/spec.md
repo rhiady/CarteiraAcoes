@@ -5,10 +5,10 @@ Garantir que corretoras armazenadas sejam instituições identificáveis e valid
 ## ADDED Requirements
 
 ### Requirement: Cadastro de corretora validada
-O sistema SHALL cadastrar uma corretora somente após validar CNPJ, dados de endereço por CEP e registro válido na fonte da CVM. O CNPJ MUST ser único; a corretora MUST incluir os dados cadastrais e de endereço retornados ou confirmados pelas fontes.
+O sistema SHALL cadastrar uma corretora somente após validar CNPJ e registro válido na fonte da CVM. O cadastro SHALL receber somente CNPJ. O CNPJ MUST ser único; a corretora MUST incluir os dados cadastrais e de endereço retornados pela consulta de CNPJ.
 
 #### Scenario: Corretora validada com sucesso
-- **WHEN** um cliente solicita cadastro com CNPJ e CEP válidos e a fonte da CVM confirma o registro
+- **WHEN** um cliente solicita cadastro com CNPJ válido e a fonte da CVM confirma o registro
 - **THEN** o sistema persiste a corretora e retorna seus dados cadastrais
 
 #### Scenario: Corretora não registrada na CVM
@@ -27,7 +27,7 @@ O sistema SHALL permitir listar corretoras paginadamente e recuperá-las por ide
 - **THEN** o sistema retorna erro padronizado de recurso não encontrado
 
 ### Requirement: Falhas de validação externa
-O sistema SHALL não persistir uma corretora quando uma fonte obrigatória de CNPJ, CEP ou CVM falhar, estiver indisponível ou retornar dados não encontrados; a resposta MUST comunicar uma falha padronizada apropriada.
+O sistema SHALL não persistir uma corretora quando uma fonte obrigatória de CNPJ ou CVM falhar, estiver indisponível ou retornar dados não encontrados; a resposta MUST comunicar uma falha padronizada apropriada.
 
 #### Scenario: Indisponibilidade da validação
 - **WHEN** a fonte obrigatória não responde dentro do limite configurado

@@ -31,4 +31,6 @@ public class AcaoResource {
     @GetMapping public Page<AcaoResponse> listar(Pageable pageable) { return service.listar(pageable); }
     @GetMapping("/{id}") public AcaoResponse buscarPorId(@PathVariable Long id) { return service.buscarPorId(id); }
     @GetMapping("/ticker/{ticker}") public AcaoResponse buscarPorTicker(@PathVariable String ticker) { return service.buscarPorTicker(ticker); }
+    @PostMapping("/{id}/cotacao")
+    public AcaoResponse atualizarCotacao(@PathVariable Long id) { return service.atualizarCotacao(id); }
 }

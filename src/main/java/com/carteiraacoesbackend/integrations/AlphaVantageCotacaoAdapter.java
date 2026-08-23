@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.carteiraacoesbackend.clients.AlphaVantageClient;
 import com.carteiraacoesbackend.dto.integrations.AlphaVantageQuoteResponse;
+import com.carteiraacoesbackend.dto.integrations.AlphaVantageCompanyResponse;
 import com.carteiraacoesbackend.exceptions.ApiException;
 
 @Component
@@ -27,6 +28,11 @@ public class AlphaVantageCotacaoAdapter {
         if (body.globalQuote() == null || body.globalQuote().price() == null) {
             throw ApiException.notFound("TICKER_NAO_ENCONTRADO", "Ticker não encontrado no provedor de mercado.");
         }
-        return new Cotacao(new BigDecimal(body.globalQuote().price()), OffsetDateTime.now(ZoneOffset.UTC));
+        AlphaVantageCompanyResponse empresa = client.consultarEmpresa("OVERVIEW", ticker, apiKey);
+        if (empresa.name() == null || empresa.name().isBlank()) {
+            throw ApiException.external(org.springframework.http.HttpStatus.BAD_GATEWAY,
+                    "EXTERNAL_API_INVALID_RESPONSE", "O provedor não retornou o nome da empresa.");
+        }
+        return new Cotacao(new BigDecimal(body.globalQuote().price()), OffsetDateTime.now(ZoneOffset.UTC), empresa.name());
     }
 }

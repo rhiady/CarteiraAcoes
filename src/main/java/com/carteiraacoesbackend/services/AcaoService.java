@@ -1,6 +1,7 @@
 package com.carteiraacoesbackend.services;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Locale;
 
 import org.springframework.data.domain.Page;
@@ -39,9 +40,10 @@ public class AcaoService {
             throw ApiException.conflict("TICKER_DUPLICADO", "Já existe uma ação com este ticker.");
         }
         Cotacao cotacao = cotacaoAdapter.consultar(ticker, request.mercado());
+        validarDadosCadastro(cotacao);
         Acao acao = new Acao();
         acao.setTicker(ticker);
-        acao.setNomeEmpresa(request.nomeEmpresa().trim());
+        acao.setNomeEmpresa(cotacao.nomeEmpresa().trim());
         acao.setMercado(request.mercado());
         acao.setMoeda(request.mercado() == com.carteiraacoesbackend.domains.enums.Mercado.BRASIL ? Moeda.BRL : Moeda.USD);
         acao.setCotacaoAtual(cotacao.preco());
@@ -55,6 +57,32 @@ public class AcaoService {
                 .orElseThrow(() -> ApiException.notFound("ACAO_NAO_ENCONTRADA", "Ação não encontrada.")));
     }
     public Page<AcaoResponse> listar(Pageable pageable) { return repository.findAll(pageable).map(mapper::toResponse); }
+
+    @Transactional
+    public AcaoResponse atualizarCotacao(Long id) {
+        Acao acao = obterEntidade(id);
+        Cotacao cotacao = cotacaoAdapter.consultar(acao.getTicker(), acao.getMercado());
+        validarCotacao(cotacao);
+        acao.setCotacaoAtual(cotacao.preco());
+        acao.setDataHoraCotacao(cotacao.dataHora().withOffsetSameInstant(ZoneOffset.UTC));
+        return mapper.toResponse(repository.save(acao));
+    }
+
+    private void validarCotacao(Cotacao cotacao) {
+        if (cotacao == null || cotacao.preco() == null || cotacao.preco().signum() <= 0 || cotacao.dataHora() == null) {
+            throw ApiException.external(org.springframework.http.HttpStatus.BAD_GATEWAY,
+                    "EXTERNAL_API_INVALID_RESPONSE", "O provedor externo retornou uma cotação inválida.");
+        }
+    }
+
+    private void validarDadosCadastro(Cotacao cotacao) {
+        validarCotacao(cotacao);
+        if (cotacao.nomeEmpresa() == null || cotacao.nomeEmpresa().isBlank()) {
+            throw ApiException.external(org.springframework.http.HttpStatus.BAD_GATEWAY,
+                    "EXTERNAL_API_INVALID_RESPONSE", "O provedor externo não retornou o nome da empresa.");
+        }
+    }
+
     public Acao obterEntidade(Long id) { return repository.findById(id)
             .orElseThrow(() -> ApiException.notFound("ACAO_NAO_ENCONTRADA", "Ação não encontrada.")); }
 }

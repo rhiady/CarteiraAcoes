@@ -5,9 +5,9 @@ O projeto precisa de um backend consistente para registrar e acompanhar carteira
 ## What Changes
 
 - Criar o domínio de usuários, carteiras, ações, posições e operações de compra e venda.
-- Expor APIs paginadas para cadastro e consulta, com DTOs, validação e respostas de erro padronizadas.
+- Expor APIs paginadas para cadastro e consulta, com DTOs, validação e respostas de erro padronizadas; o cadastro de ação recebe ticker e mercado, e o de corretora recebe somente CNPJ.
 - Persistir o modelo por migrações Flyway, com integridade, precisão financeira, UTC e controle otimista da posição.
-- Integrar consultas de cotação e a validação cadastral de corretoras por APIs externas, isoladas por adapters e facades.
+- Integrar consultas de cotação e de dados cadastrais por APIs externas, isoladas por adapters e facades, importando nome e preço da ação e todos os dados disponíveis da corretora.
 - Tornar compra e venda transacionais para que histórico e posição nunca sejam persistidos parcialmente.
 - Configurar perfis de execução, variáveis de ambiente, documentação das integrações e testes automatizados.
 

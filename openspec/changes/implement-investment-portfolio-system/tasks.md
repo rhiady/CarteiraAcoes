@@ -18,22 +18,22 @@
 
 - [x] 3.1 Implementar serviços e endpoints de criação, busca e paginação de usuários, garantindo e-mail único e senha ausente das respostas.
 - [x] 3.2 Implementar serviços e endpoints de criação e consulta de carteiras, inclusive listagem por usuário e posições ativas.
-- [x] 3.3 Implementar validação e endpoints de ações por ID e ticker, garantindo normalização de ticker e moeda derivada do mercado.
+- [x] 3.3 Implementar cadastro e endpoints de ações por ID e ticker, recebendo ticker e mercado e importando nome e cotação, com normalização de ticker e moeda derivada do mercado.
 - [x] 3.4 Implementar testes de integração para catálogo, paginação, duplicidades e recursos inexistentes.
 
 ## 4. Integrações externas e corretoras
 
 - [x] 4.1 Configurar clientes OpenFeign, DTOs de integração e conversão centralizada de erros HTTP externos.
 - [x] 4.2 Implementar adapters de cotação para os provedores brasileiro e americano e o contrato comum de consulta.
-- [x] 4.3 Implementar facades de CNPJ, CEP e CVM, com normalização dos dados de corretora.
-- [x] 4.4 Implementar serviço e endpoints de corretora, recusando persistência sem todas as validações obrigatórias.
+- [x] 4.3 Implementar facades de CNPJ e CVM, com normalização dos dados de corretora importados da consulta de CNPJ.
+- [x] 4.4 Implementar serviço e endpoints de corretora que recebem somente CNPJ e recusam persistência sem validação CVM e dados obrigatórios importados.
 - [x] 4.5 Adicionar testes com dublês para sucesso, não encontrado, autenticação, rate limit, timeout e indisponibilidade das integrações.
 
 ## 5. Cotações de ações
 
-- [ ] 5.1 Implementar atualização de cotação por ação, com preço decimal e data/hora em UTC.
-- [ ] 5.2 Aplicar política de timeout, retry restrito e ausência de preço fictício para falhas de provedor.
-- [ ] 5.3 Cobrir atualização bem-sucedida e todas as categorias de erro externo com testes.
+- [x] 5.1 Implementar atualização de cotação por ação, com preço decimal e data/hora em UTC.
+- [x] 5.2 Aplicar política de timeout, retry restrito e ausência de preço fictício para falhas de provedor.
+- [x] 5.3 Cobrir atualização bem-sucedida e todas as categorias de erro externo com testes.
 
 ## 6. Operações e consistência de carteira
 

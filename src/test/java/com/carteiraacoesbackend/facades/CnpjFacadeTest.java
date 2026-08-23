@@ -34,7 +34,8 @@ class CnpjFacadeTest {
     private static class FakeBrasilApiClient implements BrasilApiClient {
         @Override public BrasilApiCnpjResponse consultarCnpj(String cnpj) {
             if (!"12345678000190".equals(cnpj)) throw new AssertionError("CNPJ não normalizado");
-            return new BrasilApiCnpjResponse("Empresa", "Empresa", "email@test.com", "11999999999", "ATIVA");
+            return new BrasilApiCnpjResponse("Empresa", "Empresa", "email@test.com", "11999999999", "ATIVA",
+                    "01001000", "Rua", "100", null, "Centro", "São Paulo", "SP");
         }
         @Override public BrasilApiCepResponse consultarCep(String cep) { throw new UnsupportedOperationException(); }
         @Override public List<BrasilApiCvmBrokerResponse> listarCorretorasCvm() { throw new UnsupportedOperationException(); }

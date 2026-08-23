@@ -26,6 +26,12 @@ public class BrapiCotacaoAdapter {
         if (body.results() == null || body.results().isEmpty() || body.results().getFirst().regularMarketPrice() == null) {
             throw ApiException.notFound("TICKER_NAO_ENCONTRADO", "Ticker não encontrado no provedor de mercado.");
         }
-        return new Cotacao(body.results().getFirst().regularMarketPrice(), OffsetDateTime.now(ZoneOffset.UTC));
+        BrapiQuoteResponse.Result result = body.results().getFirst();
+        String nomeEmpresa = result.longName() == null || result.longName().isBlank() ? result.shortName() : result.longName();
+        if (nomeEmpresa == null || nomeEmpresa.isBlank()) {
+            throw ApiException.external(org.springframework.http.HttpStatus.BAD_GATEWAY,
+                    "EXTERNAL_API_INVALID_RESPONSE", "O provedor não retornou o nome da empresa.");
+        }
+        return new Cotacao(result.regularMarketPrice(), OffsetDateTime.now(ZoneOffset.UTC), nomeEmpresa);
     }
 }

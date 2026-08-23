@@ -27,11 +27,11 @@ O sistema SHALL criar carteiras nomeadas vinculadas a exatamente um usuário exi
 - **THEN** o sistema responde com erro padronizado de recurso não encontrado
 
 ### Requirement: Catálogo de ações por mercado
-O sistema SHALL cadastrar e consultar ações por identificador ou ticker e SHALL listar ações paginadamente. Cada ticker MUST ser único e uppercase; a ação MUST pertencer a BRASIL ou EUA, e sua moeda MUST ser automaticamente BRL ou USD, respectivamente. O cadastro MUST rejeitar ticker não localizado pelo provedor de mercado configurado.
+O sistema SHALL cadastrar e consultar ações por identificador ou ticker e SHALL listar ações paginadamente. O cadastro SHALL receber somente ticker e mercado, importando nome da empresa e cotação atual do provedor compatível. Cada ticker MUST ser único e uppercase; a ação MUST pertencer a BRASIL ou EUA, e sua moeda MUST ser automaticamente BRL ou USD, respectivamente. O cadastro MUST rejeitar ticker não localizado ou resposta sem nome ou cotação válida do provedor de mercado configurado.
 
 #### Scenario: Ação brasileira válida
 - **WHEN** um cliente cadastra ticker válido do mercado BRASIL
-- **THEN** o sistema cria a ação com moeda BRL e ticker em maiúsculas
+- **THEN** o sistema cria a ação com moeda BRL, ticker em maiúsculas, nome da empresa e cotação importados
 
 #### Scenario: Combinação de mercado e moeda inválida
 - **WHEN** um cliente tenta informar moeda incompatível ou ticker inexistente

@@ -23,7 +23,7 @@ O repositório contém o esqueleto de uma aplicação Spring Boot com JPA, valid
 
 ### Limites claros entre API, domínio e infraestrutura
 
-Resources recebem e devolvem DTOs, Services aplicam regras e transações, Repositories cuidam da persistência e Mappers fazem conversão. Cotações serão acessadas por `CotacaoAdapter`; CNPJ, CEP e CVM por facades. Clientes HTTP ficam atrás desses componentes e falhas são convertidas para exceções de domínio. Isso evita acoplamento dos casos de uso ao formato de um fornecedor. Alternativa: chamar clientes diretamente nos serviços; foi descartada por reduzir testabilidade e tornar troca de provedor arriscada.
+Resources recebem e devolvem DTOs, Services aplicam regras e transações, Repositories cuidam da persistência e Mappers fazem conversão. Cotações e metadados de empresa serão acessados por `CotacaoAdapter`; CNPJ e CVM por facades. O cadastro de ação recebe ticker e mercado, importando nome e cotação; o cadastro de corretora recebe somente CNPJ, importando os dados cadastrais e o endereço retornados pela fonte de CNPJ e exigindo registro CVM válido. Clientes HTTP ficam atrás desses componentes e falhas são convertidas para exceções de domínio. Isso evita acoplamento dos casos de uso ao formato de um fornecedor. Alternativa: chamar clientes diretamente nos serviços; foi descartada por reduzir testabilidade e tornar troca de provedor arriscada.
 
 ### Persistência controlada por migrations
 

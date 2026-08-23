@@ -1,6 +1,7 @@
 package com.carteiraacoesbackend.clients;
 
 import com.carteiraacoesbackend.dto.integrations.AlphaVantageQuoteResponse;
+import com.carteiraacoesbackend.dto.integrations.AlphaVantageCompanyResponse;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,4 +13,9 @@ public interface AlphaVantageClient {
     @GetMapping("/query")
     AlphaVantageQuoteResponse consultar(@RequestParam("function") String function, @RequestParam("symbol") String ticker,
                                   @RequestParam("apikey") String apiKey);
+
+    @GetMapping("/query")
+    AlphaVantageCompanyResponse consultarEmpresa(@RequestParam("function") String function,
+                                                   @RequestParam("symbol") String ticker,
+                                                   @RequestParam("apikey") String apiKey);
 }

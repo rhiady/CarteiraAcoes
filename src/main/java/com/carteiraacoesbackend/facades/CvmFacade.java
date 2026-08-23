@@ -14,7 +14,8 @@ public class CvmFacade {
         if (normalizado.length() != 14) throw ApiException.unprocessable("CNPJ_INVALIDO", "CNPJ deve conter 14 dígitos.");
         try {
             return client.listarCorretorasCvm().stream()
-                    .filter(c -> normalizado.equals(limpar(c.cnpj())))
+                    .filter(c -> normalizado.equals(limpar(c.cnpj())) && c.codigoCvm() != null
+                            && !c.codigoCvm().isBlank())
                     .findFirst().orElseThrow(() -> ApiException.unprocessable("CORRETORA_NAO_REGISTRADA_CVM", "A corretora não possui registro ativo na CVM."));
         } catch (ApiException exception) { throw exception; }
         catch (Exception exception) { throw ApiException.external(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "EXTERNAL_API_UNAVAILABLE", "Não foi possível consultar o cadastro da CVM."); }
