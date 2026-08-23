@@ -1,6 +1,6 @@
 package com.carteiraacoesbackend.clients;
 
-import java.util.Map;
+import com.carteiraacoesbackend.dto.integrations.BrapiQuoteResponse;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface BrapiClient {
 
     @GetMapping("/quote/{ticker}")
-    Map<String, Object> consultar(@PathVariable String ticker, @RequestParam(required = false) String token);
+    BrapiQuoteResponse consultar(@PathVariable String ticker, @RequestParam(required = false) String token);
 }
