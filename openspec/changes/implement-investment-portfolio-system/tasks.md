@@ -45,7 +45,7 @@
 
 ## 7. Qualidade e entrega operacional
 
-- [ ] 7.1 Adicionar logs seguros e estruturados para integrações, excluindo credenciais e dados sensíveis.
-- [ ] 7.2 Atualizar README com arquitetura, endpoints, execução, perfis e documentação de cada integração externa.
-- [ ] 7.3 Executar suíte completa de testes e corrigir regressões de validação, persistência e contratos HTTP.
-- [ ] 7.4 Validar a mudança OpenSpec em modo estrito e registrar qualquer limitação de ambiente restante.
+- [x] 7.1 Adicionar logs seguros e estruturados para integrações, excluindo credenciais e dados sensíveis.
+- [x] 7.2 Atualizar README com arquitetura, endpoints, execução, perfis e documentação de cada integração externa.
+- [x] 7.3 Executar suíte completa de testes e corrigir regressões de validação, persistência e contratos HTTP.
+- [x] 7.4 Validar a mudança OpenSpec em modo estrito e registrar qualquer limitação de ambiente restante.
