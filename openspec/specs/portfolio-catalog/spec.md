@@ -29,15 +29,23 @@ O sistema SHALL criar carteiras nomeadas vinculadas a exatamente um usuário exi
 - **THEN** o sistema responde com erro padronizado de recurso não encontrado
 
 ### Requirement: Catálogo de ações por mercado
-O sistema SHALL cadastrar e consultar ações por identificador ou ticker e SHALL listar ações paginadamente. O cadastro SHALL receber somente ticker e mercado, importando nome da empresa e cotação atual do provedor compatível. Cada ticker MUST ser único e uppercase; a ação MUST pertencer a BRASIL ou EUA, e sua moeda MUST ser automaticamente BRL ou USD, respectivamente. O cadastro MUST rejeitar ticker não localizado ou resposta sem nome ou cotação válida do provedor de mercado configurado.
+O sistema SHALL consultar ações por identificador ou ticker e SHALL listar ações paginadamente. Uma ação SHALL ser criada exclusivamente como parte de uma compra válida para uma carteira existente; o sistema MUST NOT expor cadastro direto de ação. Na criação pela compra, o sistema SHALL receber ticker e mercado, importar nome da empresa e cotação atual do provedor compatível, e persistir ticker único em maiúsculas, mercado `BRASIL` ou `EUA` e a moeda derivada BRL ou USD. O sistema MUST rejeitar ticker não localizado ou resposta sem nome ou cotação válida sem persistir a ação.
+
+#### Scenario: Criação de ação por compra
+- **WHEN** uma compra válida informa ticker e mercado ainda não cadastrados
+- **THEN** o sistema cria a ação com seus dados de mercado e a associa somente à posição criada ou atualizada para a carteira da compra
 
 #### Scenario: Ação brasileira válida
-- **WHEN** um cliente cadastra ticker válido do mercado BRASIL
+- **WHEN** uma compra válida informa ticker do mercado BRASIL ainda não cadastrado
 - **THEN** o sistema cria a ação com moeda BRL, ticker em maiúsculas, nome da empresa e cotação importados
 
+#### Scenario: Cadastro direto indisponível
+- **WHEN** um cliente solicita o cadastro direto de uma ação
+- **THEN** o sistema rejeita a operação e não persiste ação sem uma compra vinculada a carteira
+
 #### Scenario: Combinação de mercado e moeda inválida
-- **WHEN** um cliente tenta informar moeda incompatível ou ticker inexistente
-- **THEN** o sistema rejeita o cadastro sem persistir a ação
+- **WHEN** uma compra informa ticker inexistente ou o provedor não retorna dados válidos para o mercado
+- **THEN** o sistema rejeita a compra sem persistir ação, posição ou operação
 
 ### Requirement: Posições ativas da carteira
 O sistema SHALL listar as ações de uma carteira apenas quando a quantidade da posição for maior que zero. Quantidades e valores monetários MUST ser representados com precisão decimal, sem valores de ponto flutuante.

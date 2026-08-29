@@ -15,7 +15,6 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.test.context.ActiveProfiles;
 
 import com.carteiraacoesbackend.domains.enums.Mercado;
-import com.carteiraacoesbackend.dto.AcaoRequest;
 import com.carteiraacoesbackend.dto.AcaoResponse;
 import com.carteiraacoesbackend.exceptions.ApiException;
 import com.carteiraacoesbackend.integrations.Cotacao;
@@ -43,7 +42,7 @@ class AcaoServiceCotacaoTest {
     @Test
     void updatesQuoteWithDecimalPriceAndUtcTimestamp() {
         cotacaoAdapter.cotacao = cotacao("10.0000", "Petrobras S.A.");
-        AcaoResponse acao = service.criar(new AcaoRequest("PETR4", Mercado.BRASIL));
+        AcaoResponse acao = criarAcao("PETR4");
         cotacaoAdapter.cotacao = new Cotacao(new BigDecimal("15.1234"), OffsetDateTime.parse("2026-08-23T10:00:00-03:00"));
 
         AcaoResponse updated = service.atualizarCotacao(acao.id());
@@ -73,7 +72,7 @@ class AcaoServiceCotacaoTest {
 
     private void verificarFalha(String ticker, ApiException failure, int expectedStatus, String expectedCode) {
         cotacaoAdapter.cotacao = cotacao("10.0000", "Empresa importada");
-        AcaoResponse acao = service.criar(new AcaoRequest(ticker, Mercado.BRASIL));
+        AcaoResponse acao = criarAcao(ticker);
         cotacaoAdapter.failure = failure;
 
         ApiException exception = assertThrows(ApiException.class, () -> service.atualizarCotacao(acao.id()));
@@ -86,6 +85,10 @@ class AcaoServiceCotacaoTest {
 
     private Cotacao cotacao(String preco, String nomeEmpresa) {
         return new Cotacao(new BigDecimal(preco), OffsetDateTime.now(ZoneOffset.UTC), nomeEmpresa);
+    }
+
+    private AcaoResponse criarAcao(String ticker) {
+        return new AcaoMapper().toResponse(service.resolverOuCriar(ticker, Mercado.BRASIL));
     }
 
     private static final class StubCotacaoAdapter implements CotacaoAdapter {

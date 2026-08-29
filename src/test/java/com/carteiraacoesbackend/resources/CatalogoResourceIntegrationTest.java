@@ -56,4 +56,26 @@ class CatalogoResourceIntegrationTest {
         mockMvc.perform(get("/carteiras/9999"))
                 .andExpect(status().isNotFound()).andExpect(jsonPath("$.error").value("CARTEIRA_NAO_ENCONTRADA"));
     }
+
+    @Test
+    void doesNotExposeDirectStockCreationAndKeepsCatalogQueriesAvailable() throws Exception {
+        mockMvc.perform(post("/acoes").contentType("application/json")
+                        .content("{\"ticker\":\"PETR4\",\"mercado\":\"BRASIL\"}"))
+                .andExpect(status().isMethodNotAllowed());
+        mockMvc.perform(get("/acoes?page=0&size=20"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.content").isArray());
+    }
+
+    @Test
+    void rejectsPurchasesWithInvalidStockIdentifiers() throws Exception {
+        mockMvc.perform(post("/operacoes/compras").contentType("application/json")
+                        .content("{\"carteiraId\":1,\"quantidade\":1,\"precoUnitario\":10}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+        mockMvc.perform(post("/operacoes/compras").contentType("application/json")
+                        .content("{\"carteiraId\":1,\"acaoId\":1,\"ticker\":\"PETR4\",\"mercado\":\"BRASIL\",\"quantidade\":1,\"precoUnitario\":10}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+        mockMvc.perform(post("/operacoes/compras").contentType("application/json")
+                        .content("{\"carteiraId\":1,\"ticker\":\"PETR4\",\"quantidade\":1,\"precoUnitario\":10}"))
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.error").value("VALIDATION_ERROR"));
+    }
 }

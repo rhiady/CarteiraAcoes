@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.carteiraacoesbackend.domains.Acao;
 import com.carteiraacoesbackend.domains.enums.Moeda;
-import com.carteiraacoesbackend.dto.AcaoRequest;
 import com.carteiraacoesbackend.dto.AcaoResponse;
 import com.carteiraacoesbackend.exceptions.ApiException;
 import com.carteiraacoesbackend.integrations.Cotacao;
@@ -34,21 +33,31 @@ public class AcaoService {
     }
 
     @Transactional
-    public AcaoResponse criar(AcaoRequest request) {
-        String ticker = request.ticker().trim().toUpperCase(Locale.ROOT);
+    public Acao resolverOuCriar(String ticker, com.carteiraacoesbackend.domains.enums.Mercado mercado) {
+        if (ticker == null || ticker.isBlank() || mercado == null) {
+            throw ApiException.unprocessable("IDENTIFICACAO_ACAO_INVALIDA", "Informe acaoId ou ticker e mercado.");
+        }
+        String tickerNormalizado = ticker.trim().toUpperCase(Locale.ROOT);
+        return repository.findByTickerIgnoreCase(tickerNormalizado)
+                .orElseGet(() -> criarEntidade(tickerNormalizado, mercado));
+    }
+
+    private Acao criarEntidade(String tickerInformado, com.carteiraacoesbackend.domains.enums.Mercado mercado) {
+        String ticker = tickerInformado.trim().toUpperCase(Locale.ROOT);
         if (repository.existsByTickerIgnoreCase(ticker)) {
             throw ApiException.conflict("TICKER_DUPLICADO", "Já existe uma ação com este ticker.");
         }
-        Cotacao cotacao = cotacaoAdapter.consultar(ticker, request.mercado());
+        Cotacao cotacao = cotacaoAdapter.consultar(ticker, mercado);
         validarDadosCadastro(cotacao);
         Acao acao = new Acao();
         acao.setTicker(ticker);
         acao.setNomeEmpresa(cotacao.nomeEmpresa().trim());
-        acao.setMercado(request.mercado());
-        acao.setMoeda(request.mercado() == com.carteiraacoesbackend.domains.enums.Mercado.BRASIL ? Moeda.BRL : Moeda.USD);
+        acao.setMercado(mercado);
+        acao.setMoeda(mercado == com.carteiraacoesbackend.domains.enums.Mercado.BRASIL ? Moeda.BRL : Moeda.USD);
         acao.setCotacaoAtual(cotacao.preco());
         acao.setDataHoraCotacao(cotacao.dataHora());
-        return mapper.toResponse(repository.save(acao));
+        // Força a verificação da unicidade do ticker antes de a compra criar posição ou operação.
+        return repository.saveAndFlush(acao);
     }
 
     public AcaoResponse buscarPorId(Long id) { return mapper.toResponse(obterEntidade(id)); }

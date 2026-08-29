@@ -49,7 +49,8 @@ class OperacaoServiceIntegrationTest {
         Usuario usuario = new Usuario(); usuario.setNome("Ana"); usuario.setEmail("ana" + System.nanoTime() + "@test.com"); usuario.setSenha("senha"); usuarios.save(usuario);
         carteira = new Carteira(); carteira.setNome("Carteira"); carteira.setUsuario(usuario); carteira = carteiras.save(carteira);
         acao = new Acao(); acao.setTicker("TEST3"); acao.setNomeEmpresa("Teste"); acao.setMercado(Mercado.BRASIL); acao.setMoeda(Moeda.BRL); acao = acoes.save(acao);
-        when(cotacaoAdapter.consultar(any(), any())).thenReturn(new Cotacao(new BigDecimal("10.00"), java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC)));
+        when(cotacaoAdapter.consultar(any(), any())).thenReturn(new Cotacao(new BigDecimal("10.00"),
+                java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC), "Empresa de teste"));
     }
 
     @Test
@@ -74,5 +75,61 @@ class OperacaoServiceIntegrationTest {
         when(cotacaoAdapter.consultar(any(), any())).thenThrow(new ApiException(org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "EXTERNAL_API_UNAVAILABLE", "indisponível"));
         assertThatThrownBy(() -> service.comprar(new CompraRequest(carteira.getId(), acao.getId(), BigDecimal.ONE, null, null, null, null))).isInstanceOf(ApiException.class);
         assertThat(operacoes.count()).isZero(); assertThat(posicoes.count()).isZero();
+    }
+
+    @Test
+    void createsStockAndPositionWhenBuyingWithTickerAndMarket() {
+        var compra = service.comprar(new CompraRequest(carteira.getId(), null, "novo3", Mercado.BRASIL,
+                new BigDecimal("3"), new BigDecimal("12.50"), null, null, null));
+
+        Acao acaoCriada = acoes.findById(compra.acaoId()).orElseThrow();
+        CarteiraAcao posicao = posicoes.findByCarteiraIdAndAcaoId(carteira.getId(), acaoCriada.getId()).orElseThrow();
+        assertThat(acaoCriada.getTicker()).isEqualTo("NOVO3");
+        assertThat(posicao.getQuantidade()).isEqualByComparingTo("3");
+        assertThat(operacoes.count()).isEqualTo(1);
+    }
+
+    @Test
+    void reusesStockByTickerAndChangesOnlyTheRequestedPortfolio() {
+        Acao existente = acoes.save(acaoNova("REUSE3"));
+
+        service.comprar(new CompraRequest(carteira.getId(), null, "reuse3", Mercado.BRASIL,
+                BigDecimal.ONE, new BigDecimal("10"), null, null, null));
+
+        assertThat(acoes.findByTickerIgnoreCase("REUSE3")).map(Acao::getId).contains(existente.getId());
+        assertThat(posicoes.findByCarteiraIdAndAcaoId(carteira.getId(), existente.getId())).isPresent();
+    }
+
+    @Test
+    void rejectsInvalidStockIdentifiersWithoutPersistingAnything() {
+        assertThatThrownBy(() -> service.comprar(new CompraRequest(carteira.getId(), null, null, null,
+                BigDecimal.ONE, new BigDecimal("10"), null, null, null)))
+                .isInstanceOf(ApiException.class).extracting("code").isEqualTo("IDENTIFICACAO_ACAO_INVALIDA");
+        assertThatThrownBy(() -> service.comprar(new CompraRequest(carteira.getId(), acao.getId(), "TEST3", Mercado.BRASIL,
+                BigDecimal.ONE, new BigDecimal("10"), null, null, null)))
+                .isInstanceOf(ApiException.class).extracting("code").isEqualTo("IDENTIFICACAO_ACAO_INVALIDA");
+        assertThat(operacoes.count()).isZero();
+        assertThat(posicoes.count()).isZero();
+    }
+
+    @Test
+    void rollsBackNewStockWhenItsMarketLookupFails() {
+        when(cotacaoAdapter.consultar(any(), any())).thenThrow(new ApiException(org.springframework.http.HttpStatus.NOT_FOUND,
+                "TICKER_NAO_ENCONTRADO", "não encontrado"));
+
+        assertThatThrownBy(() -> service.comprar(new CompraRequest(carteira.getId(), null, "INVALID", Mercado.BRASIL,
+                BigDecimal.ONE, new BigDecimal("10"), null, null, null))).isInstanceOf(ApiException.class);
+
+        assertThat(acoes.findByTickerIgnoreCase("INVALID")).isEmpty();
+        assertThat(posicoes.count()).isZero();
+        assertThat(operacoes.count()).isZero();
+    }
+
+    private Acao acaoNova(String ticker) {
+        Acao nova = new Acao();
+        nova.setTicker(ticker); nova.setNomeEmpresa("Teste"); nova.setMercado(Mercado.BRASIL);
+        nova.setMoeda(Moeda.BRL); nova.setCotacaoAtual(BigDecimal.TEN);
+        nova.setDataHoraCotacao(java.time.OffsetDateTime.now(java.time.ZoneOffset.UTC));
+        return nova;
     }
 }

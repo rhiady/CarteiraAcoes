@@ -41,7 +41,11 @@ public class OperacaoService {
     @Transactional
     public OperacaoResponse comprar(CompraRequest request) {
         Carteira carteira = carteiraService.obterEntidade(request.carteiraId());
-        Acao acao = acaoService.obterEntidade(request.acaoId());
+        if (!request.isStockIdentifierValid()) {
+            throw ApiException.unprocessable("IDENTIFICACAO_ACAO_INVALIDA", "Informe acaoId ou ticker e mercado.");
+        }
+        Acao acao = request.acaoId() != null ? acaoService.obterEntidade(request.acaoId())
+                : acaoService.resolverOuCriar(request.ticker(), request.mercado());
         BigDecimal preco = request.precoUnitario() != null ? request.precoUnitario()
                 : cotacaoAdapter.consultar(acao.getTicker(), acao.getMercado()).preco();
         CarteiraAcao posicao = posicoes.findByCarteiraIdAndAcaoId(carteira.getId(), acao.getId())

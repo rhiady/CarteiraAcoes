@@ -11,11 +11,11 @@ import com.carteiraacoesbackend.exceptions.ApiException;
 public class DefaultCotacaoAdapter implements CotacaoAdapter {
 
     private final BrapiCotacaoAdapter brapi;
-    private final AlphaVantageCotacaoAdapter alphaVantage;
+    private final TwelveDataCotacaoAdapter twelveData;
 
-    public DefaultCotacaoAdapter(BrapiCotacaoAdapter brapi, AlphaVantageCotacaoAdapter alphaVantage) {
+    public DefaultCotacaoAdapter(BrapiCotacaoAdapter brapi, TwelveDataCotacaoAdapter twelveData) {
         this.brapi = brapi;
-        this.alphaVantage = alphaVantage;
+        this.twelveData = twelveData;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class DefaultCotacaoAdapter implements CotacaoAdapter {
             if (mercado == Mercado.BRASIL) {
                 return brapi.consultar(ticker);
             }
-            return alphaVantage.consultar(ticker);
+            return twelveData.consultar(ticker);
         } catch (ApiException exception) {
             throw exception;
         } catch (Exception exception) {

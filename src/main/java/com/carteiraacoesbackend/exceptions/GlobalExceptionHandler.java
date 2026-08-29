@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 import com.carteiraacoesbackend.dto.ErroResponse;
 
@@ -31,6 +32,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErroResponse> handleIntegrity(DataIntegrityViolationException exception,
                                                          HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, "DATA_INTEGRITY_VIOLATION", "Os dados informados violam uma regra de integridade.", request);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErroResponse> handleMethodNotAllowed(HttpRequestMethodNotSupportedException exception,
+                                                                 HttpServletRequest request) {
+        return response(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED", "Método HTTP não permitido para este recurso.", request);
     }
 
     @ExceptionHandler(Exception.class)
